@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="web">
+            <group id="serviceworker" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Service Worker Settings</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable</label>
+                    <comment><![CDATA[Register a Service Worker on the store to enable caching assets for faster page load times and viewing previously visited pages while offline.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="offline_page" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Offline Notification Page</label>
+                    <comment><![CDATA[This CMS page will be displayed to visitors when they are browsing offline and have reached a page they haven't visited before or tried an action which is not available offline (such as adding to cart).]]></comment>
+                    <source_model>Magento\Cms\Model\Config\Source\Page</source_model>
+                </field>
+                <field id="custom_strategies" translate="label comment" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Caching Strategies</label>
+                    <comment><![CDATA[Specify custom caching strategies used for specific pages. If the path ends with "*", the selected strategy will be applied to all pages starting with the entered path.]]></comment>
+                    <frontend_model>Challenge\ServiceWorker\Block\Adminhtml\Form\Field\CustomStrategies</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="ga_offline_enable" translate="label comment" type="select" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Offline Google Analytics</label>
+                    <comment><![CDATA[If enabled, caches any Google Analytics tracking events while the visitor is browsing offline and submits them when internet connection is restored.]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,94 @@
+<?php /** @var \Challenge\ServiceWorker\Block\Js $block */ ?>
+'use strict';
+
+// Import and initialise external dependencies
+// #####################################
+
+<?php if ($externalScripts = $block->getExternalScriptUrls()): ?>
+importScripts(<?php echo implode(", ", array_map(function ($url) { return "'{$url}'"; }, $externalScripts)) ?>);
+<?php endif; ?>
+
+<?php if ($block->isGaOfflineEnabled()): ?>
+workbox.googleAnalytics.initialize();
+<?php endif; ?>
+
+// Initialize the workbox service worker
+// #####################################
+
+const wbsw = new WorkboxSW({
+    clientsClaim: true,
+    skipWaiting: true,
+});
+
+// Pre-cache fallback responses
+// #####################################
+
+const OFFLINE_PAGE_URL = '<?php echo $block->getOfflinePageUrl() ?>';
+
+wbsw.precache([
+    {
+        url: OFFLINE_PAGE_URL,
+        revision: '<?php echo $block->getVersion() ?>',
+    }
+]);
+
+// Serve assets using cache-first strategy
+// #####################################
+wbsw.router.registerRoute(/^(.*)(wysiwyg)(.*)(.(png|jpeg|jpg|gif))$/, wbsw.strategies.cacheFirst());
+wbsw.router.registerRoute(/^(.*)(catalog\/product)(.*)(main_1)(.(png|jpeg|jpg|gif))$/, wbsw.strategies.cacheFirst());
+
+// Serve backend requests with network-only strategy
+// #####################################
+
+wbsw.router.registerRoute('<?php echo $block->getBackendPathPrefix() ?>', wbsw.strategies.networkOnly());
+
+// Serve paths with configured custom strategies
+// #####################################
+
+const custom_strategies = <?php echo $block->jsonEncode($block->getCustomStrategies()) ?>;
+
+for (let route of custom_strategies) {
+    wbsw.router.registerRoute(route.path, ({event}) => {
+        return wbsw.strategies[route.strategy]().handle({event})
+            .then((response) => {
+                if (!response && event.request.mode == 'navigate') {
+                    return caches.match(OFFLINE_PAGE_URL);
+                }
+                return response;
+            })
+            .catch(() => event.request.mode == 'navigate' ? caches.match(OFFLINE_PAGE_URL) : Response.error());
+    });
+}
+
+// Set default strategies
+// #####################################
+
+wbsw.router.setDefaultHandler({
+    handler: ({event}) => {
+        switch (event.request.method) {
+            case 'GET':
+                // For GET requests, use network-first with offline page fallback
+                return wbsw.strategies.networkFirst().handle({event})
+                    .then((response) => {
+                        if (!response && event.request.mode == 'navigate') {
+                            return caches.match(OFFLINE_PAGE_URL);
+                        }
+                        return response;
+                    });
+            case 'POST':
+                // For POST requests, use network-only with offline page fallback
+                return wbsw.strategies.networkOnly().handle({event})
+                    .catch(() => event.request.mode == 'navigate' ? caches.match(OFFLINE_PAGE_URL) : Response.error());
+            default:
+                // Use network-only for all other request types
+                return wbsw.strategies.networkOnly().handle({event});
+        }
+    },
+});
+
+<?php if ($childHtml = $block->getChildHtml()): ?>
+// Extensions
+// #####################################
+
+<?php echo $childHtml ?>
+<?php endif; ?>

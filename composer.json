@@ -1,0 +1,33 @@
+{
+  "name": "haseeb-memon/magento2-serviceworker",
+  "description": "A Magento 2 extension that adds Service Worker support.",
+  "type": "magento2-module",
+  "version": "2.2.0",
+  "license": [
+    "MIT"
+  ],
+  "authors": [
+    {
+      "name": "Haseeb Memon",
+      "email": "memon.haseeb@hotmail.com"
+    }
+  ],
+  "repositories": {
+    "magento": {
+      "type": "composer",
+      "url": "https://repo.magento.com/"
+    }
+  },
+  "require": {
+    "magento/module-config": "^101.0.0",
+    "magento/module-cms": "^102.0.0"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Challenge\\ServiceWorker\\": ""
+    }
+  }
+}

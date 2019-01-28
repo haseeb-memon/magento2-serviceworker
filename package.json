@@ -1,0 +1,26 @@
+{
+  "name": "@haseeb-memon/magento2-serviceworker",
+  "version": "2.2.0",
+  "description": "A Magento 2 extension that adds Service Worker support.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:clean": "rm -rf src/view/frontend/web/js/lib/*",
+    "build:copy": "find node_modules -path '*/importScripts/*' -name '*.prod.*' -exec install -t src/view/frontend/web/js/lib {} +",
+    "build": "npm run build:clean && npm run build:copy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haseeb-memon/magento2-serviceworker.git"
+  },
+  "author": "Haseeb Memon <memon.haseeb@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/haseeb-memon/magento2-serviceworker/issues"
+  },
+  "homepage": "https://github.com/haseeb-memon/magento2-serviceworker#readme",
+  "dependencies": {
+    "workbox-google-analytics": "^1.0.0",
+    "workbox-sw": "^1.0.1"
+  }
+}
